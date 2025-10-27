@@ -1,9 +1,17 @@
 import tkinter as tk
 from pathlib import Path
 from PIL import Image, ImageTk
+import sys
 
 KEY_SIZE = (64, 64)
-IMG_DIR = Path("img")
+
+# -------- корректный путь для exe и скрипта --------
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys._MEIPASS)
+else:
+    BASE_DIR = Path(__file__).parent
+
+IMG_DIR = BASE_DIR / "img"
 
 mapping = {
     'q': 'q','w': 'w','e': 'e','r': 'r','t': 't','y': 'y','u': 'u','i': 'i','o': 'o','p': 'p',
@@ -16,7 +24,6 @@ images = {}
 buttons = {}
 
 def load_resized_image(path):
-    """Loads and scales PNGs"""
     img = Image.open(path).convert("RGBA")
     img = img.resize(KEY_SIZE, Image.LANCZOS)
     return ImageTk.PhotoImage(img)
