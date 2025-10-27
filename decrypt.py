@@ -5,7 +5,6 @@ import sys
 
 KEY_SIZE = (64, 64)
 
-# -------- корректный путь для exe и скрипта --------
 if getattr(sys, 'frozen', False):
     BASE_DIR = Path(sys._MEIPASS)
 else:
@@ -14,9 +13,16 @@ else:
 IMG_DIR = BASE_DIR / "img"
 
 mapping = {
-    'q': 'q','w': 'w','e': 'e','r': 'r','t': 't','y': 'y','u': 'u','i': 'i','o': 'o','p': 'p',
-    'a': 'a','s': 's','d': 'd','f': 'f','g': 'g','h': 'h','j': 'j','k': 'k','l': 'l',';': ';',
-    'z': 'z','x': 'x','c': 'c','v': 'v','b': 'b','n': 'n','m': 'm',',': ',','.': '.','/': '/'
+    **{c: c for c in "abcdefghijklmnopqrstuvwxyz"},
+    ',': ',', '.': '.', '/': '/', '?': '?', '!': '!', "'": "'"
+}
+
+ICON_NAMES = {
+    '?': 'question',
+    '!': 'exclamation',
+    "'": 'apostrophe',
+    ',': 'comma',
+    '/': 'slash'
 }
 
 shift_on = False
@@ -50,7 +56,8 @@ def update_keyboard():
     for k, btn in buttons.items():
         if k in ["Shift", "Space", "Enter"]:
             continue
-        img_name = f"{k.upper()}_key.png" if shift_on else f"S{k.upper()}_key.png"
+        safe_name = ICON_NAMES.get(k, k.upper())
+        img_name = f"{safe_name}_key.png" if shift_on else f"S{safe_name}_key.png"
         img_path = IMG_DIR / img_name
         if img_path.exists():
             images[k] = load_resized_image(img_path)
@@ -64,12 +71,19 @@ root.title("Virtual keyboard")
 text_box = tk.Text(root, height=3, width=50)
 text_box.pack(pady=10)
 
-rows = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
+rows = [
+    "qwertyuiop",
+    "asdfghjkl",
+    "zxcvbnm",
+    ",/?!'"
+]
+
 for row in rows:
     frame = tk.Frame(root)
     frame.pack(pady=2)
     for k in row:
-        img_name = f"S{k.upper()}_key.png"
+        safe_name = ICON_NAMES.get(k, k.upper())
+        img_name = f"S{safe_name}_key.png"
         img_path = IMG_DIR / img_name
         if img_path.exists():
             images[k] = load_resized_image(img_path)
